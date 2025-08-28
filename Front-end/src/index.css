@@ -1,0 +1,5 @@
+html, body, #root { height: 100%; }
+body { background: #f7f8fb; }
+.card { border-radius: 1rem; }
+.rounded-top-4 { border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
+.small.text-muted { color: #6c757d !important; }

@@ -1,0 +1,23 @@
+:root{
+  --pp-sky: #1f2a44;
+  --pp-red: #ff6b6b;
+  --pp-gold: #d4af37;
+}
+
+.text-gradient{
+  background: linear-gradient(90deg, var(--pp-sky), var(--pp-red), var(--pp-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pp-hero{
+  min-height: 68vh;
+  background: radial-gradient(1200px 600px at 50% -20%, rgba(31,42,68,.06), rgba(0,0,0,0)),
+              linear-gradient(180deg, #ffffff, #eef1f8);
+  display: flex;
+  align-items: center;
+}
+
+.pp-author-avatar{ width: 64px; height: 64px; object-fit: cover; }
+.pp-section-title{ font-weight: 700; }
