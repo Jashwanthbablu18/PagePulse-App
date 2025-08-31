@@ -1,18 +1,13 @@
 // server.js
-// ✅ Full backend for PagePulse
-// ✅ Serves API + React frontend build correctly on Render
-
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import axios from 'axios'
 import path from 'path'
 import { fileURLToPath } from 'url'
-
-// Import OpenAI helper
 import { generateInsights } from './services/openaiService.js'
 
-// Setup __dirname for ES modules
+// Helpers for ESM __dirname / __filename
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -20,28 +15,25 @@ const app = express()
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
-// ---- ENV CONFIG ----
 const PORT = process.env.PORT || 8080
 const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY || ''
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1/volumes'
 
-// ---- HELPERS ----
+// ---- Small helpers ----
 const uiAvatar = (name = 'Unknown Author') =>
-  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    name
-  )}&size=128&background=1f2a44&color=fff&rounded=true`
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=128&background=1f2a44&color=fff&rounded=true`
 
 const amazonSearch = (title = '', authors = []) => {
   const q = encodeURIComponent(`${title} ${authors.join(' ')}`.trim())
   return `https://www.amazon.in/s?k=${q}`
 }
 
-// ---- HEALTH CHECK ----
-app.get('/api', (_req, res) => {
-  res.json({ ok: true, name: 'PagePulse API', tagline: 'Your next read, one pulse away' })
-})
+// ---- Health Check ----
+app.get('/api/health', (_req, res) =>
+  res.json({ ok: true, name: 'PagePulse API', message: 'Running smoothly 🚀' })
+)
 
-// ---- SEARCH ----
+// ---- Search Books ----
 app.get('/api/pagepulse/search', async (req, res) => {
   try {
     const { title } = req.query
@@ -56,7 +48,7 @@ app.get('/api/pagepulse/search', async (req, res) => {
         const v = item.volumeInfo || {}
         return {
           title: v.title,
-          author: (v.authors && v.authors[0]) || null,
+          author: v.authors?.[0] || null,
           workId: item.id,
           isbn: v.industryIdentifiers?.[0]?.identifier || null,
           coverUrl: v.imageLinks?.thumbnail || null,
@@ -68,11 +60,11 @@ app.get('/api/pagepulse/search', async (req, res) => {
     res.json({ results })
   } catch (err) {
     console.error('[search]', err?.message || err)
-    res.status(500).json({ error: 'Failed to fetch books from Google Books API' })
+    res.status(500).json({ error: 'Failed to fetch books' })
   }
 })
 
-// ---- BOOK DETAILS ----
+// ---- Book Details ----
 app.get('/api/pagepulse/books/:workId', async (req, res) => {
   try {
     const { workId } = req.params
@@ -81,8 +73,8 @@ app.get('/api/pagepulse/books/:workId', async (req, res) => {
     const { data: bookData } = await axios.get(`${GOOGLE_BOOKS_BASE}/${workId}`, {
       params: { key: GOOGLE_BOOKS_API_KEY }
     })
-    const v = bookData.volumeInfo || {}
 
+    const v = bookData.volumeInfo || {}
     const book = {
       id: bookData.id,
       title: v.title || null,
@@ -136,11 +128,11 @@ app.get('/api/pagepulse/books/:workId', async (req, res) => {
   }
 })
 
-// ---- AI INSIGHTS ----
+// ---- AI Insights ----
 app.post('/api/pagepulse/insights', async (req, res) => {
   try {
     const { title, author, description } = req.body || {}
-    if (!title) return res.status(400).json({ error: 'title is required for insights' })
+    if (!title) return res.status(400).json({ error: 'title is required' })
 
     const ai = await generateInsights({ title, author, description })
     res.json(ai || { summary: null, insights: [] })
@@ -150,16 +142,17 @@ app.post('/api/pagepulse/insights', async (req, res) => {
   }
 })
 
-// ---- SERVE FRONTEND BUILD ----
+// ---- Serve Frontend (Vite dist) ----
 const frontendDist = path.resolve(__dirname, '../Front-end/dist')
+console.log('📂 Serving frontend from:', frontendDist)
+
 app.use(express.static(frontendDist))
 
-// Catch-all → React Router
+// Fallback: always return index.html for React Router
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendDist, 'index.html'))
 })
 
-// ---- START SERVER ----
 app.listen(PORT, () => {
-  console.log(`✅ PagePulse API running on http://localhost:${PORT}`)
+  console.log(`✅ PagePulse running on http://localhost:${PORT}`)
 })
