@@ -1,9 +1,11 @@
 {
   "name": "pagepulse-root",
-  "version": "1.0.0",
   "private": true,
+  "version": "1.0.0",
   "scripts": {
-    "install": "cd Front-end && npm install && cd ../Back-end && npm install",
+    "install": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd Front-end && npm install",
+    "install:backend": "cd Back-end && npm install",
     "build": "cd Front-end && npm run build",
     "start": "cd Back-end && npm start"
   }
