@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "install": "npm run install:frontend && npm run install:backend",
+    "postinstall": "npm run install:frontend && npm run install:backend",
     "install:frontend": "cd Front-end && npm install",
     "install:backend": "cd Back-end && npm install",
     "build": "cd Front-end && npm run build",
