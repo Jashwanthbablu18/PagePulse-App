@@ -8,26 +8,18 @@ import axios from 'axios'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Local helpers / services
+// Import AI service AFTER env
 import { generateInsights } from './services/openaiService.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
 const app = express()
-
-// CORS only in dev; Render/production serves same origin
-if (process.env.NODE_ENV !== 'production') {
-  app.use(cors())
-}
-
+app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
 const PORT = process.env.PORT || 8080
 const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY || ''
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1/volumes'
 
-// --- small helpers ---
+// Helpers
 const uiAvatar = (name = 'Unknown Author') =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=128&background=1f2a44&color=fff&rounded=true`
 
@@ -36,14 +28,12 @@ const amazonSearch = (title = '', authors = []) => {
   return `https://www.amazon.in/s?k=${q}`
 }
 
-// -------------------- API ROUTES --------------------
-
-// health
+// ---- HEALTH ----
 app.get('/api', (_req, res) =>
   res.json({ ok: true, name: 'PagePulse API', tagline: 'Your next read, one pulse away' })
 )
 
-// SEARCH: /api/pagepulse/search?title=...
+// ---- SEARCH ----
 app.get('/api/pagepulse/search', async (req, res) => {
   try {
     const { title } = req.query
@@ -75,7 +65,7 @@ app.get('/api/pagepulse/search', async (req, res) => {
   }
 })
 
-// BOOK DETAILS: /api/pagepulse/books/:workId
+// ---- BOOK DETAILS ----
 app.get('/api/pagepulse/books/:workId', async (req, res) => {
   try {
     const { workId } = req.params
@@ -139,7 +129,7 @@ app.get('/api/pagepulse/books/:workId', async (req, res) => {
   }
 })
 
-// AI INSIGHTS: /api/pagepulse/insights  { title, author, description }
+// ---- AI INSIGHTS ----
 app.post('/api/pagepulse/insights', async (req, res) => {
   try {
     const { title, author, description } = req.body || {}
@@ -153,19 +143,17 @@ app.post('/api/pagepulse/insights', async (req, res) => {
   }
 })
 
-// -------------------- STATIC FRONTEND (PROD) --------------------
-// In production, serve the Vite build output from ./public
-const publicDir = path.join(__dirname, 'public')
-app.use(express.static(publicDir))
+// ---- STATIC FRONTEND SERVE (for Render) ----
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-// Send index.html for non-API routes (client-side routing)
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next()
-  res.sendFile(path.join(publicDir, 'index.html'))
-})
-
-// ---------------------------------------------------------------
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../Front-end/dist')))
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../Front-end/dist/index.html'))
+  })
+}
 
 app.listen(PORT, () => {
-  console.log(`PagePulse server running on http://localhost:${PORT}`)
+  console.log(`✅ PagePulse API running on http://localhost:${PORT}`)
 })
