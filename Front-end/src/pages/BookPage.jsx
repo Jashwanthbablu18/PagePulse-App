@@ -1,11 +1,15 @@
-import { useParams } from 'react-router-dom'
-import BookDetails from '../components/BookDetails'
+// Front-end/src/pages/BookPage.jsx
+import React from "react";
+import { useParams } from "react-router-dom";
+import BookDetails from "../components/BookDetails.jsx";
 
 export default function BookPage() {
-  const { workId } = useParams() // this is actually a Google Books volume ID
+  const { workId } = useParams();
+
   return (
-    <section className="py-4">
+    <div className="book-page p-4">
+      <h2 className="text-xl font-bold mb-4">Book Details</h2>
       <BookDetails workId={workId} />
-    </section>
-  )
+    </div>
+  );
 }
