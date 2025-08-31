@@ -1,22 +1,16 @@
-// vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// Build the React app directly into ./public so Express can serve it.
-// Also proxy /api calls to the Node server during local dev.
 export default defineConfig({
   plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true
-      }
-    }
-  },
+  root: '.',                 // make sure it treats Front-end as root
+  publicDir: 'public',       // keep public as is
   build: {
-    outDir: 'public',   // Express serves this in production
-    emptyOutDir: true
+    outDir: 'dist',          // ✅ ensure dist is used
+    emptyOutDir: true,
+    rollupOptions: {
+      input: path.resolve(__dirname, 'index.html') // ✅ ensure correct entry
+    }
   }
 })
