@@ -1,10 +1,17 @@
 {
-  "name": "pagepulse-root",
+  "name": "pagepulse-backend",
   "version": "1.0.0",
   "private": true,
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "install": "cd Front-end && npm install && cd ../Back-end && npm install",
-    "build": "cd Front-end && npm run build",
-    "start": "npm run build && cd Back-end && npm start"
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.56.0"
   }
 }

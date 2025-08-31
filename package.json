@@ -1,7 +1,7 @@
 {
   "name": "pagepulse-root",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "postinstall": "npm run install:frontend && npm run install:backend",
     "install:frontend": "cd Front-end && npm install",
