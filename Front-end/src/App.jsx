@@ -1,24 +1,18 @@
-import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import About from './pages/About'
-import BookPage from './pages/BookPage'
-import NotFound from './pages/NotFound'
-import Header from './components/Header'
-import Footer from './components/Footer'
+// Front-end/src/App.jsx
+import React from "react"
+import { Routes, Route } from "react-router-dom"
+import HomePage from "./pages/HomePage"
+import SearchResults from "./pages/SearchResults"
+import BookDetails from "./pages/BookDetails"
+import NotFound from "./pages/NotFound"
 
 export default function App() {
   return (
-    <div className="app d-flex flex-column min-vh-100 bg-body">
-      <Header />
-      <main className="flex-fill">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/book/:workId" element={<BookPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/search" element={<SearchResults />} />
+      <Route path="/book/:id" element={<BookDetails />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   )
 }
