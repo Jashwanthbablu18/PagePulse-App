@@ -1,37 +1,45 @@
 // server.js
-// Load env first
-import 'dotenv/config'
+// ✅ Full backend for PagePulse
+// ✅ Serves API + React frontend build correctly on Render
 
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import axios from 'axios'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Import AI service AFTER env
+// Import OpenAI helper
 import { generateInsights } from './services/openaiService.js'
+
+// Setup __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
+// ---- ENV CONFIG ----
 const PORT = process.env.PORT || 8080
 const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY || ''
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1/volumes'
 
-// Helpers
+// ---- HELPERS ----
 const uiAvatar = (name = 'Unknown Author') =>
-  `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=128&background=1f2a44&color=fff&rounded=true`
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    name
+  )}&size=128&background=1f2a44&color=fff&rounded=true`
 
 const amazonSearch = (title = '', authors = []) => {
   const q = encodeURIComponent(`${title} ${authors.join(' ')}`.trim())
   return `https://www.amazon.in/s?k=${q}`
 }
 
-// ---- HEALTH ----
-app.get('/api', (_req, res) =>
+// ---- HEALTH CHECK ----
+app.get('/api', (_req, res) => {
   res.json({ ok: true, name: 'PagePulse API', tagline: 'Your next read, one pulse away' })
-)
+})
 
 // ---- SEARCH ----
 app.get('/api/pagepulse/search', async (req, res) => {
@@ -50,8 +58,7 @@ app.get('/api/pagepulse/search', async (req, res) => {
           title: v.title,
           author: (v.authors && v.authors[0]) || null,
           workId: item.id,
-          edition_olid: null,
-          isbn: (v.industryIdentifiers && v.industryIdentifiers[0]?.identifier) || null,
+          isbn: v.industryIdentifiers?.[0]?.identifier || null,
           coverUrl: v.imageLinks?.thumbnail || null,
           averageRating: v.averageRating || null,
           ratingsCount: v.ratingsCount || null
@@ -143,17 +150,16 @@ app.post('/api/pagepulse/insights', async (req, res) => {
   }
 })
 
-// ---- STATIC FRONTEND SERVE (for Render) ----
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// ---- SERVE FRONTEND BUILD ----
+const frontendDist = path.resolve(__dirname, '../Front-end/dist')
+app.use(express.static(frontendDist))
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../Front-end/dist')))
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../Front-end/dist/index.html'))
-  })
-}
+// Catch-all → React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'))
+})
 
+// ---- START SERVER ----
 app.listen(PORT, () => {
   console.log(`✅ PagePulse API running on http://localhost:${PORT}`)
 })
