@@ -1,15 +1,11 @@
-import { Router } from 'express'
-import { searchController, getBookController, insightsController } from '../controllers/PagepulseController.js'
+// Back-end/routes/pagepulseRoutes.js
+import { Router } from "express";
+import { searchController, getBookController, insightsController } from "../controllers/PagepulseController.js";
 
-const router = Router()
+const router = Router();
 
-// GET /api/pagepulse/search?title=...
-router.get('/search', searchController)
+router.get("/search", searchController);
+router.get("/books/:workId", getBookController);
+router.post("/insights", insightsController);
 
-// GET /api/pagepulse/books/:workId
-router.get('/books/:workId', getBookController)
-
-// POST /api/pagepulse/insights
-router.post('/insights', insightsController)
-
-export default router
+export default router;

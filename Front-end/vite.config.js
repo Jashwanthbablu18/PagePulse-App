@@ -1,16 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+// Front-end/vite.config.js
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
-  root: '.',                 // make sure it treats Front-end as root
-  publicDir: 'public',       // keep public as is
+  base: "./",             // ✅ make asset paths relative (safer behind proxies)
+  root: ".",              // default is current dir; explicit for clarity
+  publicDir: "public",
   build: {
-    outDir: 'dist',          // ✅ ensure dist is used
+    outDir: "dist",
     emptyOutDir: true,
     rollupOptions: {
-      input: path.resolve(__dirname, 'index.html') // ✅ ensure correct entry
-    }
-  }
-})
+      input: path.resolve(__dirname, "index.html"),
+    },
+  },
+});
