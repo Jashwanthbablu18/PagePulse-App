@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
-import pagepulseRoutes from "./routes/pagepulseRoutes.js"; // ✅ mount your API!
+import pagepulseRoutes from "./routes/PagepulseRoutes.js"; // ✅ mount your API!
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
